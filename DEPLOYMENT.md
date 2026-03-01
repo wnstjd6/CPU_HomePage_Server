@@ -82,9 +82,9 @@ cp .env.example .env
 ```
 DB_HOST=localhost
 DB_PORT=3306
-DB_USERNAME=stu11
+DB_USERNAME=cpu
 DB_PASSWORD=your_db_password
-DB_NAME=stu11
+DB_NAME=cpu
 NODE_ENV=development
 PORT=3000
 CORS_ORIGIN=http://localhost:5173
@@ -136,9 +136,9 @@ cp .env.example .env
 ```
 DB_HOST=127.0.0.1
 DB_PORT=3306
-DB_USERNAME=stu11
+DB_USERNAME=cpu
 DB_PASSWORD=<stu11-db-password>
-DB_NAME=stu11
+DB_NAME=cpu
 NODE_ENV=production
 PORT=3000
 CORS_ORIGIN=https://cpu.it.kr
