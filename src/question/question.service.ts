@@ -57,10 +57,6 @@ export class QuestionService {
 
   async findOne(id: number): Promise<QuestionEntity> {
     try {
-      if (!Number.isInteger(id) || id <= 0) {
-        throw new BadRequestException('유효한 질문 ID가 아닙니다.');
-      }
-
       const question = await this.questionRepository.findOne({
         where: { id },
       });
@@ -89,10 +85,6 @@ export class QuestionService {
 
   async remove(id: number): Promise<void> {
     try {
-      if (!Number.isInteger(id) || id <= 0) {
-        throw new BadRequestException('유효한 질문 ID가 아닙니다.');
-      }
-
       const result = await this.questionRepository.delete(id);
 
       if (result.affected === 0) {

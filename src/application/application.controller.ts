@@ -7,6 +7,7 @@ import {
   Delete,
   HttpStatus,
   HttpCode,
+  ParseUUIDPipe,
 } from '@nestjs/common';
 import { ApplicationService } from './application.service';
 import { CreateApplicationDto } from './dto/create-application.dto';
@@ -55,7 +56,9 @@ export class ApplicationController {
   }
 
   @Get(':id')
-  async getApplicationById(@Param('id') id: string): Promise<{
+  async getApplicationById(
+    @Param('id', new ParseUUIDPipe({ version: '4' })) id: string,
+  ): Promise<{
     success: boolean;
     data?: ApplicationEntity;
     message?: string;
@@ -77,7 +80,9 @@ export class ApplicationController {
   }
 
   @Delete(':id')
-  async deleteApplication(@Param('id') id: string): Promise<{
+  async deleteApplication(
+    @Param('id', new ParseUUIDPipe({ version: '4' })) id: string,
+  ): Promise<{
     success: boolean;
     message: string;
   }> {

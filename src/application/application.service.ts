@@ -65,11 +65,6 @@ export class ApplicationService {
 
   async findOne(id: string): Promise<ApplicationEntity> {
     try {
-      // UUID 형식 검증
-      if (!this.isValidUUID(id)) {
-        throw new BadRequestException('유효한 지원서 ID가 아닙니다.');
-      }
-
       const application = await this.applicationRepository.findOne({
         where: { id },
       });
@@ -95,11 +90,6 @@ export class ApplicationService {
 
   async remove(id: string): Promise<void> {
     try {
-      // UUID 형식 검증
-      if (!this.isValidUUID(id)) {
-        throw new BadRequestException('유효한 지원서 ID가 아닙니다.');
-      }
-
       const result = await this.applicationRepository.delete(id);
 
       if (result.affected === 0) {
@@ -117,11 +107,6 @@ export class ApplicationService {
         HttpStatus.INTERNAL_SERVER_ERROR,
       );
     }
-  }
-
-  private isValidUUID(uuid: string): boolean {
-    const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-    return uuidRegex.test(uuid);
   }
 }
 
