@@ -23,5 +23,12 @@ export const typeOrmConfig: TypeOrmModuleOptions = {
     process.env.DB_LOGGING,
     process.env.NODE_ENV !== 'production',
   ),
+  extra: {
+    connectionLimit: parseInt(process.env.DB_POOL_SIZE || '20', 10),
+    waitForConnections: true,
+    queueLimit: parseInt(process.env.DB_QUEUE_LIMIT || '0', 10),
+    enableKeepAlive: true,
+    keepAliveInitialDelay: 0,
+  },
   timezone: '+09:00',
 };

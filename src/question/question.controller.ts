@@ -8,6 +8,8 @@ import {
   HttpStatus,
   HttpCode,
   ParseIntPipe,
+  Query,
+  DefaultValuePipe,
 } from '@nestjs/common';
 import { QuestionService } from './question.service';
 import { CreateQuestionDto } from './dto/create-question.dto';
@@ -42,14 +44,35 @@ export class QuestionController {
   }
 
   @Get()
-  async getAllQuestions(): Promise<{
+  async getAllQuestions(
+    @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number,
+    @Query('limit', new DefaultValuePipe(50), ParseIntPipe) limit: number,
+  ): Promise<{
     success: boolean;
     data: QuestionEntity[];
+    pagination: {
+      page: number;
+      limit: number;
+      total: number;
+      hasNextPage: boolean;
+    };
   }> {
-    const data = await this.questionService.findAll();
+    const normalizedPage = Math.max(1, page);
+    const normalizedLimit = Math.min(100, Math.max(1, limit));
+    const { items, total } = await this.questionService.findAll(
+      normalizedPage,
+      normalizedLimit,
+    );
+
     return {
       success: true,
-      data,
+      data: items,
+      pagination: {
+        page: normalizedPage,
+        limit: normalizedLimit,
+        total,
+        hasNextPage: normalizedPage * normalizedLimit < total,
+      },
     };
   }
 

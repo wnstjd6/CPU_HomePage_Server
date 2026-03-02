@@ -40,13 +40,21 @@ export class QuestionService {
     }
   }
 
-  async findAll(): Promise<QuestionEntity[]> {
+  async findAll(
+    page = 1,
+    limit = 50,
+  ): Promise<{ items: QuestionEntity[]; total: number }> {
     try {
-      return await this.questionRepository.find({
+      const skip = (page - 1) * limit;
+      const [items, total] = await this.questionRepository.findAndCount({
+        skip,
+        take: limit,
         order: {
           id: 'DESC',
         },
       });
+
+      return { items, total };
     } catch {
       throw new HttpException(
         '질문 조회 중 오류가 발생했습니다.',
