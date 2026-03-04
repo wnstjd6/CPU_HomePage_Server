@@ -10,6 +10,7 @@ import {
   ParseIntPipe,
   Query,
   DefaultValuePipe,
+  ForbiddenException,
 } from '@nestjs/common';
 import { QuestionService } from './question.service';
 import { CreateQuestionDto } from './dto/create-question.dto';
@@ -47,6 +48,7 @@ export class QuestionController {
   async getAllQuestions(
     @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number,
     @Query('limit', new DefaultValuePipe(50), ParseIntPipe) limit: number,
+    @Query('secret') secret?: string,
   ): Promise<{
     success: boolean;
     data: QuestionEntity[];
@@ -57,13 +59,15 @@ export class QuestionController {
       hasNextPage: boolean;
     };
   }> {
+    if (secret !== '0000') {
+      throw new ForbiddenException('접근 권한이 없습니다.');
+    }
     const normalizedPage = Math.max(1, page);
     const normalizedLimit = Math.min(100, Math.max(1, limit));
     const { items, total } = await this.questionService.findAll(
       normalizedPage,
       normalizedLimit,
     );
-
     return {
       success: true,
       data: items,
@@ -99,10 +103,16 @@ export class QuestionController {
   }
 
   @Delete(':id')
-  async deleteQuestion(@Param('id', ParseIntPipe) id: number): Promise<{
+  async deleteQuestion(
+    @Param('id', ParseIntPipe) id: number,
+    @Query('secret') secret?: string,
+  ): Promise<{
     success: boolean;
     message: string;
   }> {
+    if (secret !== '0000') {
+      throw new ForbiddenException('접근 권한이 없습니다.');
+    }
     try {
       await this.questionService.remove(id);
       return {

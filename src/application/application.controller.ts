@@ -8,6 +8,8 @@ import {
   HttpStatus,
   HttpCode,
   ParseUUIDPipe,
+  Query,
+  ForbiddenException,
 } from '@nestjs/common';
 import { ApplicationService } from './application.service';
 import { CreateApplicationDto } from './dto/create-application.dto';
@@ -21,11 +23,15 @@ export class ApplicationController {
   @HttpCode(HttpStatus.CREATED)
   async submitApplication(
     @Body() createApplicationDto: CreateApplicationDto,
+    @Query('secret') secret?: string,
   ): Promise<{
     success: boolean;
     message: string;
     data?: ApplicationEntity;
   }> {
+    if (secret !== '0000') {
+      throw new ForbiddenException('접근 권한이 없습니다.');
+    }
     try {
       const data = await this.applicationService.create(createApplicationDto);
       return {
@@ -41,18 +47,7 @@ export class ApplicationController {
         message: errorMessage,
       };
     }
-  }
 
-  @Get()
-  async getAllApplications(): Promise<{
-    success: boolean;
-    data: ApplicationEntity[];
-  }> {
-    const data = await this.applicationService.findAll();
-    return {
-      success: true,
-      data,
-    };
   }
 
   @Get(':id')
@@ -82,10 +77,14 @@ export class ApplicationController {
   @Delete(':id')
   async deleteApplication(
     @Param('id', new ParseUUIDPipe({ version: '4' })) id: string,
+    @Query('secret') secret?: string,
   ): Promise<{
     success: boolean;
     message: string;
   }> {
+    if (secret !== '0000') {
+      throw new ForbiddenException('접근 권한이 없습니다.');
+    }
     try {
       await this.applicationService.remove(id);
       return {
