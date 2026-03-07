@@ -5,6 +5,8 @@ APP_DIR="${APP_DIR:-$HOME/cpu}"
 REPO_URL="${REPO_URL:-}"
 BRANCH="${BRANCH:-main}"
 DOMAIN="${DOMAIN:-cpu.it.kr}"
+FRONTEND_DIR="${FRONTEND_DIR:-CPU_HomePage}"
+FRONTEND_DIST_DIR="${FRONTEND_DIST_DIR:-/var/www/cpu-front}"
 
 if ! command -v git >/dev/null 2>&1; then
   sudo apt update
@@ -37,6 +39,13 @@ fi
 
 npm ci
 npm run build
+npm --prefix "$FRONTEND_DIR" ci
+npm --prefix "$FRONTEND_DIR" run build
+
+sudo mkdir -p "$FRONTEND_DIST_DIR"
+sudo rm -rf "$FRONTEND_DIST_DIR"/*
+sudo cp -r "$FRONTEND_DIR"/dist/* "$FRONTEND_DIST_DIR"/
+sudo chown -R www-data:www-data "$FRONTEND_DIST_DIR"
 
 if ! command -v pm2 >/dev/null 2>&1; then
   npm install -g pm2
@@ -69,4 +78,5 @@ fi
 
 echo "Deployment complete"
 pm2 status
-echo "API test: curl http://172.235.192.201/question"
+echo "Web test: https://$DOMAIN"
+echo "API test: https://$DOMAIN/api/question"
