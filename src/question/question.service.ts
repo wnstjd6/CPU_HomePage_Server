@@ -40,6 +40,26 @@ export class QuestionService {
     }
   }
 
+  async updateAnswer(id: number, answer: string): Promise<void> {
+    if (typeof answer !== 'string' || answer.trim() === '') {
+      throw new BadRequestException('답변 내용이 비어있거나 올바르지 않습니다.');
+    }
+    const question = await this.questionRepository.findOne({ where: { id } });
+    if (!question) {
+      throw new HttpException('질문을 찾을 수 없습니다.', HttpStatus.NOT_FOUND);
+    }
+    if (question.answer === answer) {
+      // 변경 사항이 없으면 바로 반환
+      return;
+    }
+    question.answer = answer;
+    try {
+      await this.questionRepository.save(question);
+    } catch (error) {
+      throw new HttpException('답변 저장 중 오류가 발생했습니다.', HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+  }
+
   async findAll(
     page = 1,
     limit = 50,

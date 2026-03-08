@@ -11,12 +11,14 @@ import {
   Query,
   DefaultValuePipe,
   ForbiddenException,
+  Patch,
 } from '@nestjs/common';
 import { QuestionService } from './question.service';
 import { CreateQuestionDto } from './dto/create-question.dto';
 import { QuestionEntity } from './entities/question.entity';
 
 @Controller('question')
+  
 export class QuestionController {
   constructor(private readonly questionService: QuestionService) {}
 
@@ -101,7 +103,7 @@ export class QuestionController {
       };
     }
   }
-
+      
   @Delete(':id')
   async deleteQuestion(
     @Param('id', ParseIntPipe) id: number,
@@ -127,5 +129,18 @@ export class QuestionController {
         message: errorMessage,
       };
     }
+  }
+
+  @Patch(':id')
+  async updateAnswer(
+    @Param('id', ParseIntPipe) id: number,
+    @Body('answer') answer: string,
+    @Query('secret') secret?: string,
+  ): Promise<{ success: boolean; message: string }> {
+    if (secret !== '0000') {
+      throw new ForbiddenException('접근 권한이 없습니다.');
+    }
+    await this.questionService.updateAnswer(id, answer);
+    return { success: true, message: '답변이 저장되었습니다.' };
   }
 }
