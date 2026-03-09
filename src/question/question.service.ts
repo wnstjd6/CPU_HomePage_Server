@@ -11,6 +11,19 @@ import { QuestionEntity } from './entities/question.entity';
 
 @Injectable()
 export class QuestionService {
+    /**
+     * 모든 질문 데이터를 삭제하고, 삭제 전/후 카운트 반환
+     */
+    async clearAllQuestions(): Promise<{ before: number; after: number }> {
+      const before = await this.questionRepository.count();
+      try {
+        await this.questionRepository.clear();
+        const after = await this.questionRepository.count();
+        return { before, after };
+      } catch (error) {
+        throw new HttpException('질문 전체 삭제 중 오류가 발생했습니다.', HttpStatus.INTERNAL_SERVER_ERROR);
+      }
+    }
   constructor(
     @InjectRepository(QuestionEntity)
     private readonly questionRepository: Repository<QuestionEntity>,

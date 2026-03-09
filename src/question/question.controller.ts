@@ -20,6 +20,34 @@ import { QuestionEntity } from './entities/question.entity';
 @Controller('question')
   
 export class QuestionController {
+    /**
+     * 모든 질문 데이터 삭제 엔드포인트
+     * secret 쿼리 필요 (예: ?secret=0000)
+     */
+    @Delete('clear')
+    @HttpCode(HttpStatus.OK)
+    async clearQuestions(
+      @Query('secret') secret?: string,
+    ): Promise<{ success: boolean; message: string; before?: number; after?: number }> {
+      if (secret !== '0000') {
+        throw new ForbiddenException('접근 권한이 없습니다.');
+      }
+      try {
+        const { before, after } = await this.questionService.clearAllQuestions();
+        return {
+          success: true,
+          message: `질문 데이터가 모두 삭제되었습니다. (삭제 전: ${before}, 삭제 후: ${after})`,
+          before,
+          after,
+        };
+      } catch (error) {
+        const errorMessage = error instanceof Error ? error.message : '질문 전체 삭제에 실패했습니다.';
+        return {
+          success: false,
+          message: errorMessage,
+        };
+      }
+    }
   constructor(private readonly questionService: QuestionService) {}
 
   @Post()
